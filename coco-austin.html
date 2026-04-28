@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<title>Coco's Austin Trip</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,600;0,700;1,600&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{height:100%;font-size:16px}
+body{font-family:'Source Sans 3',sans-serif;background:#F5F0E8;min-height:100%;overscroll-behavior:none}
+
+/* ── NAV TABS ── */
+.tabs{display:flex;background:#2C2018;border-bottom:3px solid #B8945A;position:sticky;top:0;z-index:50}
+.tab{flex:1;padding:16px 6px 14px;text-align:center;font-family:'Source Sans 3',sans-serif;font-size:13px;font-weight:600;letter-spacing:.6px;color:#8A7A66;cursor:pointer;transition:all .2s;border:none;background:none}
+.tab.on{color:#D4AA70;border-bottom:3px solid #D4AA70;margin-bottom:-3px}
+
+/* ── HEADER ── */
+header{background:#2C2018;padding:22px 20px 18px;text-align:center}
+.header-title{font-family:'Lora',serif;font-size:30px;font-weight:700;color:#F5EEE0;letter-spacing:.5px;line-height:1.1}
+.header-tag{font-family:'Lora',serif;font-size:15px;font-weight:600;font-style:italic;color:#D4AA70;margin-top:4px}
+.header-meta{font-family:'Source Sans 3',sans-serif;font-size:13px;color:#7A6A58;letter-spacing:.8px;margin-top:8px;font-weight:500}
+.gold-rule{height:3px;background:linear-gradient(90deg,#B8945A,#E8D0A0 40%,#B8945A 80%,#9A7840)}
+.progress-row{display:flex;align-items:center;gap:10px;justify-content:center;margin-top:12px}
+.progress-bar{width:150px;height:3px;background:#3E2E1E;border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;background:#D4AA70;border-radius:3px;transition:width .4s}
+.progress-lbl{font-family:'Source Sans 3',sans-serif;font-size:12px;color:#7A6A58;letter-spacing:.5px}
+.header-btns{display:flex;gap:10px;justify-content:center;margin-top:14px}
+.btn-ghost{background:transparent;color:#F0E8D8;border:1.5px solid rgba(240,232,216,.4);border-radius:6px;padding:10px 22px;font-family:'Source Sans 3',sans-serif;font-size:13px;font-weight:600;letter-spacing:.5px;cursor:pointer;transition:all .2s;-webkit-appearance:none}
+.btn-ghost:active{background:rgba(240,232,216,.15)}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:#2C2018;color:#D4AA70;font-family:'Source Sans 3',sans-serif;font-size:14px;letter-spacing:.3px;padding:12px 24px;border-radius:8px;border:1.5px solid #B8945A;opacity:0;pointer-events:none;transition:opacity .3s;z-index:200;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.3)}
+.toast.show{opacity:1}
+
+/* ── SELECTION BANNER ── */
+.sel-banner{position:fixed;bottom:0;left:0;right:0;background:#2C2018;border-top:3px solid #B8945A;padding:16px 20px;display:none;z-index:100;align-items:center;justify-content:space-between}
+.sel-banner.show{display:flex}
+.sel-banner-text{font-family:'Source Sans 3',sans-serif;font-size:14px;color:#D4AA70;letter-spacing:.3px;font-weight:600}
+.sel-banner-hint{font-family:'Source Sans 3',sans-serif;font-size:12px;color:#7A6A58;letter-spacing:.2px;margin-top:3px}
+.sel-cancel{background:none;border:1.5px solid #6A5A48;border-radius:6px;color:#8A7A68;font-family:'Source Sans 3',sans-serif;font-size:12px;letter-spacing:.5px;padding:8px 16px;cursor:pointer;font-weight:600}
+.sel-cancel:active{background:#3E2E1E}
+
+/* ── BANK VIEW ── */
+#bankView{display:block}
+.bank-top{padding:18px 18px 10px;background:#EDE8DC;border-bottom:1px solid #D8CEBC}
+.bank-section-title{font-family:'Lora',serif;font-weight:700;font-size:20px;color:#2A1E10;letter-spacing:.3px}
+.bank-hint{font-family:'Source Sans 3',sans-serif;font-size:13px;color:#6A5A48;margin-top:4px;line-height:1.5}
+.filters{display:flex;gap:8px;margin-top:12px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.filters::-webkit-scrollbar{display:none}
+.fp{border:1.5px solid #C8B898;background:#F5F0E8;border-radius:6px;padding:8px 16px;font-family:'Source Sans 3',sans-serif;font-size:12px;font-weight:600;letter-spacing:.5px;cursor:pointer;color:#5A4A38;white-space:nowrap;-webkit-appearance:none;flex-shrink:0;transition:all .15s}
+.fp.on,.fp:active{background:#2C2018;color:#F0E8D8;border-color:#2C2018}
+.bank-count{font-family:'Source Sans 3',sans-serif;font-size:12px;color:#8A7A68;margin-top:10px;letter-spacing:.2px;line-height:1.5}
+.bank-list{padding:12px 16px 140px}
+
+/* ── ITINERARY VIEW ── */
+#itinView{display:none;padding:16px 16px 140px}
+.day-card{background:#fff;border-radius:10px;border:1.5px solid #DDD0BC;margin-bottom:14px;overflow:hidden;box-shadow:0 2px 8px rgba(60,40,20,.07)}
+.day-card.sel-target{border-color:#B8945A;box-shadow:0 0 0 3px rgba(184,148,90,.2)}
+.day-head{display:flex;align-items:center;justify-content:space-between;padding:16px 16px 13px;border-bottom:1px solid #F0E8D8;cursor:pointer;user-select:none}
+.day-date{font-family:'Lora',serif;font-weight:700;font-size:20px;color:#1C1410;letter-spacing:.2px}
+.day-name{font-family:'Source Sans 3',sans-serif;font-size:12px;color:#8A7A68;letter-spacing:.8px;text-transform:uppercase;font-weight:600;margin-top:2px}
+.day-rule{height:2px;background:linear-gradient(90deg,#B8945A,#E4D0B0)}
+.day-head-right{display:flex;align-items:center;gap:10px}
+.day-badge{font-family:'Source Sans 3',sans-serif;font-size:11px;color:#8A7A68;font-weight:600;letter-spacing:.6px;background:#F5EEE0;padding:4px 10px;border-radius:5px}
+.day-chevron{font-size:13px;color:#B8A890;transition:transform .2s}
+.day-body{padding:12px 14px 14px}
+.day-body.collapsed{display:none}
+.day-empty-inline{color:#B8A890;font-size:14px;text-align:center;padding:20px 10px;border:1.5px dashed #D8CCBC;border-radius:6px;line-height:1.9;font-family:'Source Sans 3',sans-serif;cursor:pointer;transition:all .2s}
+.day-card.sel-target .day-empty-inline{border-color:#B8945A;color:#9A7840;background:#FDFAF2}
+.day-add-btn{width:100%;margin-top:10px;padding:13px;background:transparent;border:1.5px dashed #C8B898;border-radius:6px;font-family:'Source Sans 3',sans-serif;font-size:13px;font-weight:600;letter-spacing:.5px;color:#8A7A68;cursor:pointer;transition:all .2s;-webkit-appearance:none}
+.day-card.sel-target .day-add-btn{border-color:#B8945A;color:#9A7840;background:#FDFAF2}
+.day-add-btn:active{background:#F5EEE0}
+
+/* ── ACTIVITY CARD ── */
+.card{background:#fff;border-radius:8px;padding:14px 50px 14px 14px;margin-bottom:9px;border:1.5px solid #E8DDD0;position:relative;user-select:none;transition:all .2s;cursor:pointer}
+.card:active{transform:scale(.99);box-shadow:0 3px 12px rgba(60,40,20,.12)}
+.card.selected{border-color:#B8945A;background:#FDFAF3;box-shadow:0 0 0 3px rgba(184,148,90,.18)}
+.card.done .card-name{text-decoration:line-through;opacity:.5}
+.card.done{opacity:.65}
+.card-inner{display:flex;gap:11px;align-items:flex-start}
+.card-emoji{font-size:20px;line-height:1.3;flex-shrink:0}
+.card-body{flex:1;min-width:0}
+.card-name{font-family:'Source Sans 3',sans-serif;font-weight:600;font-size:15px;color:#1E1610;line-height:1.4}
+.card-duration{font-family:'Source Sans 3',sans-serif;font-size:12px;color:#9A8070;margin-top:3px}
+.card-tip{font-family:'Source Sans 3',sans-serif;font-size:12px;color:#6A5A48;margin-top:5px;line-height:1.6;font-style:italic}
+.card-tag{display:inline-block;padding:3px 10px;border-radius:4px;font-size:11px;font-weight:600;letter-spacing:.4px;font-family:'Source Sans 3',sans-serif;margin-top:8px}
+.card-action{position:absolute;top:50%;transform:translateY(-50%);right:10px;display:flex;flex-direction:column;gap:6px;align-items:center}
+.card-check{background:none;border:none;cursor:pointer;font-size:20px;line-height:1;padding:6px;color:#C4B4A0}
+.card-check.checked{color:#3D6654}
+.card-remove{background:none;border:none;cursor:pointer;font-size:16px;line-height:1;padding:6px;color:#C4B4A0}
+.card-remove:active{color:#8A4030}
+
+/* ── LEGEND ── */
+.legend{display:flex;flex-wrap:wrap;gap:12px;padding:4px 2px 10px;margin-top:4px}
+.legend-item{display:flex;align-items:center;gap:6px}
+.legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.legend-label{font-family:'Source Sans 3',sans-serif;font-size:12px;color:#8A7A68;font-weight:500}
+
+/* ── MODAL ── */
+.modal-bg{position:fixed;inset:0;background:rgba(20,14,8,.72);display:flex;align-items:flex-end;justify-content:center;z-index:150;opacity:0;pointer-events:none;transition:opacity .25s}
+.modal-bg.open{opacity:1;pointer-events:all}
+.modal{background:#FAF7F0;border-radius:16px 16px 0 0;width:100%;max-width:540px;padding:26px 22px 40px;box-shadow:0 -8px 40px rgba(0,0,0,.25);transform:translateY(20px);transition:transform .25s;border-top:3px solid #B8945A;max-height:88vh;overflow-y:auto}
+.modal-bg.open .modal{transform:translateY(0)}
+.modal-handle{width:40px;height:4px;background:#D8CCBC;border-radius:2px;margin:0 auto 20px}
+.modal-title{font-family:'Lora',serif;font-weight:700;font-size:22px;color:#1C1410;margin-bottom:6px}
+.modal-sub{font-family:'Source Sans 3',sans-serif;font-size:13px;color:#7A6A58;margin-bottom:20px;line-height:1.6}
+.modal label{font-family:'Source Sans 3',sans-serif;font-size:13px;font-weight:600;letter-spacing:.4px;color:#5A4A38;display:block;margin-bottom:6px}
+.modal input,.modal select,.modal textarea{width:100%;padding:13px 14px;border:1.5px solid #D8CCBC;border-radius:8px;font-family:'Source Sans 3',sans-serif;font-size:15px;outline:none;background:#fff;color:#2A1E10;margin-bottom:16px;-webkit-appearance:none;appearance:none}
+.modal input:focus,.modal select:focus,.modal textarea:focus{border-color:#9A7840}
+.modal textarea{resize:none;height:80px}
+.modal-row{display:flex;gap:12px}
+.modal-row>div{flex:1}
+.modal-actions{display:flex;gap:10px;margin-top:6px}
+.btn-cancel{flex:1;background:transparent;color:#7A6A58;border:1.5px solid #D8CCBC;border-radius:8px;padding:15px;font-family:'Source Sans 3',sans-serif;font-size:14px;font-weight:600;cursor:pointer;-webkit-appearance:none}
+.btn-cancel:active{background:#EDE8DC}
+.btn-primary{flex:2;background:#2C2018;color:#F0E8D8;border:none;border-radius:8px;padding:15px;font-family:'Source Sans 3',sans-serif;font-size:14px;font-weight:600;cursor:pointer;-webkit-appearance:none}
+.btn-primary:active{background:#3E2E1E}
+
+/* ── SHARE ── */
+.share-txt{font-family:'Source Sans 3',sans-serif;font-size:14px;color:#3A2E20;line-height:2;white-space:pre-wrap;background:#EDE8DC;border:1.5px solid #D0C4B0;border-radius:8px;padding:16px;max-height:280px;overflow-y:auto;letter-spacing:.1px;margin-bottom:16px;-webkit-overflow-scrolling:touch}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-title">Coco's Austin Trip</div>
+  <div class="header-tag">A Private Itinerary</div>
+  <div class="header-meta">May 9 – 19, 2026 &nbsp;·&nbsp; Eleven Days</div>
+  <div class="progress-row">
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    <div class="progress-lbl" id="progressLbl">0 of 0 complete</div>
+  </div>
+  <div class="header-btns">
+    <button class="btn-ghost" onclick="openAdd()">+ Add Activity</button>
+    <button class="btn-ghost" onclick="openShare()">Share</button>
+  </div>
+</header>
+<div class="gold-rule"></div>
+
+<div class="tabs">
+  <button class="tab on" id="tabBank" onclick="showTab('bank')">Activity Bank</button>
+  <button class="tab" id="tabItin" onclick="showTab('itin')">Itinerary</button>
+</div>
+
+<div id="bankView">
+  <div class="bank-top">
+    <div class="bank-section-title">Activity Bank</div>
+    <div class="bank-hint">Tap an activity to select it, then go to Itinerary and tap a day to place it there.</div>
+    <div class="filters" id="filters"></div>
+    <div class="bank-count" id="bankCount"></div>
+  </div>
+  <div class="bank-list" id="bankList"></div>
+</div>
+
+<div id="itinView">
+  <div class="legend" id="legend"></div>
+  <div id="dayList"></div>
+</div>
+
+<div class="sel-banner" id="selBanner">
+  <div>
+    <div class="sel-banner-text" id="selBannerText">Activity selected</div>
+    <div class="sel-banner-hint">Go to Itinerary and tap a day to place it</div>
+  </div>
+  <button class="sel-cancel" onclick="clearSelection()">Cancel</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="modal-bg" id="addModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Add an Activity</div>
+    <div class="modal-sub">It will appear in the Activity Bank, ready to place on any day.</div>
+    <label>Activity Name</label>
+    <input type="text" id="addName" placeholder="e.g. Wine tasting at The Austin Winery" autocomplete="off"/>
+    <div class="modal-row">
+      <div>
+        <label>Emoji</label>
+        <input type="text" id="addEmoji" placeholder="🍷" maxlength="4" autocomplete="off"/>
+      </div>
+      <div>
+        <label>Duration</label>
+        <input type="text" id="addDuration" placeholder="2 hrs" autocomplete="off"/>
+      </div>
+    </div>
+    <label>Category</label>
+    <select id="addCat"></select>
+    <label>Note or Tip</label>
+    <textarea id="addTip" placeholder="Reservation needed? Budget-friendly? Any helpful notes…"></textarea>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('addModal')">Cancel</button>
+      <button class="btn-primary" onclick="submitAdd()">Add to Bank</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="shareModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Share Itinerary</div>
+    <div class="modal-sub">Copy and paste into a text message, email, or Notes.</div>
+    <div class="share-txt" id="shareTxt"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('shareModal')">Close</button>
+      <button class="btn-primary" onclick="copyShare()">Copy to Clipboard</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const DAYS = [
+  {date:"May 9",  day:"Friday",    key:"may9"},
+  {date:"May 10", day:"Saturday",  key:"may10"},
+  {date:"May 11", day:"Sunday",    key:"may11"},
+  {date:"May 12", day:"Monday",    key:"may12"},
+  {date:"May 13", day:"Tuesday",   key:"may13"},
+  {date:"May 14", day:"Wednesday", key:"may14"},
+  {date:"May 15", day:"Thursday",  key:"may15"},
+  {date:"May 16", day:"Friday",    key:"may16"},
+  {date:"May 17", day:"Saturday",  key:"may17"},
+  {date:"May 18", day:"Sunday",    key:"may18"},
+  {date:"May 19", day:"Monday",    key:"may19"},
+];
+
+const CAT = {
+  food:       {label:"Dining",         color:"#7A4A28", bg:"#FAF2E8", line:"#C8946A"},
+  music:      {label:"Live Music",     color:"#4A3A68", bg:"#F2F0F8", line:"#9888C0"},
+  outdoors:   {label:"Outdoors",       color:"#2A5A3A", bg:"#EDF5EE", line:"#6AAA80"},
+  culture:    {label:"Arts & Culture", color:"#28486A", bg:"#EAF0F8", line:"#6898C8"},
+  shopping:   {label:"Shopping",       color:"#6A3A50", bg:"#F8EEF2", line:"#B87898"},
+  daytrip:    {label:"Day Trip",       color:"#5A4020", bg:"#F5EEE0", line:"#A87848"},
+  relaxation: {label:"Wellness",       color:"#384858", bg:"#EEF2F5", line:"#7898A8"},
+  crafts:     {label:"Crafts & Cozy",  color:"#4A4820", bg:"#F5F3E0", line:"#989048"},
+};
+
+let bank = [
+  {id:"a1",  name:"6th Street Live Music Crawl",            emoji:"🎸", category:"music",      duration:"3–4 hrs",  tip:"Best after 9pm on weekends"},
+  {id:"a2",  name:"Franklin Barbecue",                       emoji:"🍖", category:"food",       duration:"2 hrs",    tip:"Arrive by 8am — the line starts early"},
+  {id:"a3",  name:"South Congress Ave",                      emoji:"🛍️", category:"shopping",   duration:"2–3 hrs",  tip:"Vintage shops, local boutiques & great people-watching"},
+  {id:"a4",  name:"Barton Springs Pool",                     emoji:"🏊", category:"outdoors",   duration:"Half day", tip:"Natural spring pool — so refreshing in the May heat"},
+  {id:"a5",  name:"Blanton Museum of Art",                   emoji:"🎨", category:"culture",    duration:"2 hrs",    tip:"Free on Thursdays — stunning permanent collection"},
+  {id:"a6",  name:"Zilker Park & Kayaking",                  emoji:"🚣", category:"outdoors",   duration:"3 hrs",    tip:"Rent kayaks on the Colorado River"},
+  {id:"a7",  name:"Texas State Capitol Tour",                emoji:"🏛️", category:"culture",    duration:"1.5 hrs",  tip:"Free guided tours available daily"},
+  {id:"a8",  name:"Uchiko or Uchi Dinner",                   emoji:"🍣", category:"food",       duration:"2 hrs",    tip:"Reserve well in advance — top sushi in Austin"},
+  {id:"a9",  name:"Lady Bird Lake Trail Walk",               emoji:"🌅", category:"outdoors",   duration:"1–2 hrs",  tip:"Gorgeous sunrise or sunset stroll along the water"},
+  {id:"a10", name:"Amy's Ice Creams",                        emoji:"🍦", category:"food",       duration:"30 min",   tip:"South Congress location is iconic — try the Mexican Vanilla"},
+  {id:"a11", name:"Stubb's Amphitheater",                    emoji:"🎶", category:"music",      duration:"4 hrs",    tip:"Check their May concert lineup — outdoor shows are magical"},
+  {id:"a13", name:"Day Trip — San Marcos",                   emoji:"🚗", category:"daytrip",    duration:"Full day", tip:"River tubing + great outlet shopping"},
+  {id:"a14", name:"Day Trip — Fredericksburg",               emoji:"🍷", category:"daytrip",    duration:"Full day", tip:"Texas Hill Country wine tasting — stunning scenery"},
+  {id:"a15", name:"Juan in a Million",                       emoji:"🌮", category:"food",       duration:"1 hr",     tip:"Famous breakfast tacos — cash only, worth every penny"},
+  {id:"a16", name:"Bullock Texas History Museum",            emoji:"🏺", category:"culture",    duration:"2 hrs",    tip:"IMAX films included with admission"},
+  {id:"a17", name:"Congress Bridge Bat Watch",               emoji:"🦇", category:"outdoors",   duration:"1.5 hrs",  tip:"1.5M bats emerge at dusk — a genuinely magical moment"},
+  {id:"a18", name:"Spa Day — Milk + Honey",                  emoji:"💆", category:"relaxation", duration:"2–3 hrs",  tip:"Book a massage + facial combo — pure indulgence"},
+  {id:"a20", name:"Deep Eddy Cabaret",                       emoji:"🍹", category:"music",      duration:"2 hrs",    tip:"Oldest bar in Austin — great classic cocktails"},
+  {id:"a21", name:"Mount Bonnell",                           emoji:"⛰️", category:"outdoors",   duration:"1.5 hrs",  tip:"Best panoramic views of Austin — go at golden hour"},
+  {id:"a22", name:"East Austin Art Walk",                    emoji:"🖼️", category:"culture",    duration:"3 hrs",    tip:"Murals, galleries & hip eateries along East 6th"},
+  {id:"a23", name:"Cooking Class — Sur La Table",            emoji:"👩‍🍳", category:"relaxation", duration:"2 hrs",    tip:"A wonderful mother-daughter afternoon"},
+  {id:"a24", name:"Cedar Park Outlets",                      emoji:"🏪", category:"shopping",   duration:"3 hrs",    tip:"Major brands at great prices"},
+  {id:"c1",  name:"Hill Country Weavers",                    emoji:"🧶", category:"crafts",     duration:"1.5 hrs",  tip:"Austin's beloved indie yarn shop — incredible fiber selection"},
+  {id:"c2",  name:"Gauge Yarn + Coffee",                     emoji:"🪡", category:"crafts",     duration:"1.5 hrs",  tip:"Yarn shop meets café on South Congress — knit, sip & browse"},
+  {id:"c3",  name:"Puzzle Night — Pinthouse Pizza",          emoji:"🧩", category:"relaxation", duration:"2.5 hrs",  tip:"Craft beer, wood-fired pizza & a cozy spot to puzzle together"},
+  {id:"c4",  name:"BookPeople",                              emoji:"📚", category:"crafts",     duration:"1.5 hrs",  tip:"Austin's iconic indie bookstore — great knitting books & puzzles"},
+  {id:"c5",  name:"Uncommon Objects",                        emoji:"🔍", category:"shopping",   duration:"2 hrs",    tip:"A treasure hunt of vintage curiosities on South Congress"},
+  {id:"c6",  name:"Knit & Sip Afternoon",                    emoji:"🍵", category:"crafts",     duration:"2–3 hrs",  tip:"Bring your knitting to Patika or Houndstooth café — pure bliss"},
+  {id:"u1",  name:"Jardin Corona",                           emoji:"🌿", category:"food",       duration:"2 hrs",    tip:"Stunning garden patio — cocktails & beautiful bites"},
+  {id:"u2",  name:"Nixa Taqueria",                           emoji:"🌮", category:"food",       duration:"1.5 hrs",  tip:"Elevated tacos with creative fillings — locally adored"},
+  {id:"u3",  name:"Oria",                                    emoji:"🫒", category:"food",       duration:"2 hrs",    tip:"Mediterranean-inspired with beautiful interiors — reserve ahead"},
+  {id:"u4",  name:"Mattie's",                                emoji:"🌸", category:"food",       duration:"2 hrs",    tip:"Gorgeous Victorian house with lush garden — perfect brunch spot"},
+  {id:"u5",  name:"Nomade",                                  emoji:"🕯️", category:"food",       duration:"2 hrs",    tip:"Intimate, candlelit — ideal for a special evening"},
+  {id:"u6",  name:"The Elephant Room",                       emoji:"🎺", category:"music",      duration:"2–3 hrs",  tip:"Legendary underground jazz club downtown — catch a live set"},
+  {id:"u7",  name:"Devil Wears Prada 2 — Alamo Drafthouse",  emoji:"🎬", category:"relaxation", duration:"3 hrs",    tip:"Dinner & drinks served during the film — book ahead"},
+  {id:"u8",  name:"Leona Cafe Bar",                          emoji:"🍸", category:"food",       duration:"1.5 hrs",  tip:"Chic east-side bar & café — lovely cocktails and atmosphere"},
+  {id:"u9",  name:"Bangers Sausage House",                   emoji:"🌭", category:"food",       duration:"2 hrs",    tip:"100+ beers on tap with a sprawling patio on Rainey St"},
+  {id:"e1",  name:"Austin Psych Fest",                       emoji:"🎸", category:"music",      duration:"Full day", tip:"May 9–10 · Far Out Lounge — psych rock, dream pop & indie"},
+  {id:"e2",  name:"O. Henry Pun-Off Championships",          emoji:"😂", category:"culture",    duration:"2 hrs",    tip:"May 9 · Free · Brush Square Park — a beloved Austin tradition"},
+  {id:"e3",  name:"LEVITATION Music Festival",               emoji:"🌀", category:"music",      duration:"Full day", tip:"May 16–17 · ACL Live Moody Theater — indie & psychedelic headliners"},
+  {id:"e4",  name:"Luke Bryan & Kane Brown",                 emoji:"🎵", category:"music",      duration:"4 hrs",    tip:"May 15–17 · Germania Amphitheater — major outdoor country show"},
+  {id:"e5",  name:"Austin City Limits TV Taping",            emoji:"📺", category:"culture",    duration:"3 hrs",    tip:"May 19 · acltv.com — iconic PBS taping, free but competitive tickets"},
+  {id:"e6",  name:"ACL Live Concert Night",                  emoji:"🎤", category:"music",      duration:"3 hrs",    tip:"Shows May 9, 10, 14, 16, 17 · Check acllive.com for lineup"},
+  {id:"v1",  name:"Vintage Bookstore & Wine Bar",            emoji:"📖", category:"relaxation", duration:"2 hrs",    tip:"East 11th St — equal parts bookstore & wine bar. Wine from $9/glass"},
+  {id:"v3",  name:"Board Game Night — Punch Bowl Social",    emoji:"♟️", category:"relaxation", duration:"3 hrs",    tip:"Huge games library, food & drinks — low-key & very affordable"},
+  {id:"v4",  name:"Austin Central Library",                  emoji:"🏛️", category:"culture",    duration:"1.5 hrs",  tip:"One of the most beautiful libraries in the US — free rooftop garden"},
+  {id:"v5",  name:"Morning Coffee & Reading — Patika",       emoji:"☕", category:"relaxation", duration:"1.5 hrs",  tip:"Stunning Barton Springs café — quiet, leafy & perfect for a slow morning"},
+  {id:"v6",  name:"Happy Hour — CRU Wine Bar",               emoji:"🍷", category:"food",       duration:"1.5 hrs",  tip:"2nd Street District · Mon–Fri 3–6:30pm · Great value pours & small plates"},
+  {id:"v7",  name:"Bocce & Wine — Fareground",               emoji:"🎯", category:"relaxation", duration:"2 hrs",    tip:"Downtown food hall with outdoor games — casual, fun & easy on the wallet"},
+];
+
+const dayItems = {
+  may9:  [
+    {id:"d1", name:"Arrival & Check-in",              emoji:"✈️", category:"relaxation", duration:"2 hrs",   tip:"Settle in, freshen up, take it easy"},
+    {id:"d2", name:"Dinner on South Congress",         emoji:"🍽️", category:"food",       duration:"2 hrs",   tip:"A gentle first-night stroll and dinner"},
+  ],
+  may10: [], may11: [],
+  may12: [
+    {id:"m1", name:"Steak Frites — Josephine House",  emoji:"🥩", category:"food",       duration:"2.5 hrs", tip:"Reserve ahead — charming bungalow restaurant, iconic dish"},
+  ],
+  may13: [], may14: [], may15: [], may16: [],
+  may17: [
+    {id:"eq1", name:"Equipment Room",                 emoji:"🎙️", category:"music",      duration:"2–3 hrs", tip:"Hidden vinyl hi-fi bar beneath Hotel Magdalena — book via Resy, sells out fast"},
+  ],
+  may18: [],
+  may19: [
+    {id:"d3", name:"Farewell Brunch",                 emoji:"☕", category:"food",       duration:"1.5 hrs", tip:"Last morning together — make it linger"},
+  ],
+};
+
+const doneSet = new Set();
+let activeFilter = "all";
+let selectedItem = null;
+let selectedFrom = null;
+let expandedDays = new Set(Object.keys(dayItems));
+let idCounter = 500;
+const uid = () => `x${idCounter++}`;
+
+function showTab(tab) {
+  document.getElementById("bankView").style.display = tab==="bank"?"block":"none";
+  document.getElementById("itinView").style.display = tab==="itin"?"block":"none";
+  document.getElementById("tabBank").className = "tab"+(tab==="bank"?" on":"");
+  document.getElementById("tabItin").className = "tab"+(tab==="itin"?" on":"");
+  render();
+}
+
+function render() {
+  renderFilters(); renderBank(); renderItin(); renderLegend(); updateProgress(); updateBanner();
+}
+
+function renderFilters() {
+  let h = `<button class="fp ${activeFilter==="all"?"on":""}" onclick="setFilter('all')">All</button>`;
+  for (const [k,v] of Object.entries(CAT)) {
+    h += `<button class="fp ${activeFilter===k?"on":""}" onclick="setFilter('${k}')">${k==="crafts"?"Crafts":v.label.split(" ")[0]}</button>`;
+  }
+  document.getElementById("filters").innerHTML = h;
+}
+
+function renderBank() {
+  const visible = activeFilter==="all" ? bank : bank.filter(i=>i.category===activeFilter);
+  document.getElementById("bankCount").textContent = `${visible.length} ${visible.length===1?"activity":"activities"} available`;
+  const el = document.getElementById("bankList");
+  if (!visible.length) {
+    el.innerHTML = `<div style="text-align:center;color:#A89880;font-family:'Source Sans 3',sans-serif;font-size:14px;padding:48px 16px;line-height:2.2">All activities are on the itinerary.<br><span style="font-size:12px">Go to Itinerary and tap ✕ to move one back here.</span></div>`;
+    return;
+  }
+  el.innerHTML = visible.map(item=>cardHTML(item,"bank")).join("");
+}
+
+function renderItin() {
+  document.getElementById("dayList").innerHTML = DAYS.map(d=>{
+    const its = dayItems[d.key]||[];
+    const expanded = expandedDays.has(d.key);
+    const badge = its.length?`<span class="day-badge">${its.length} item${its.length!==1?"s":""}</span>`:"";
+    const chevron = `<span class="day-chevron" style="transform:rotate(${expanded?"180":"0"}deg)">▼</span>`;
+    const target = selectedItem?" sel-target":"";
+    const cardsHTML = its.map(item=>cardHTML(item,d.key)).join("");
+    const placeBtn = its.length===0
+      ?`<div class="day-empty-inline" onclick="placeTo('${d.key}')">Tap to place selected activity here</div>`
+      :`<button class="day-add-btn" onclick="placeTo('${d.key}')">+ Place here</button>`;
+    return `
+      <div class="day-card${target}" id="daycard-${d.key}" onclick="dayTap('${d.key}',event)">
+        <div class="day-head" onclick="toggleDay('${d.key}',event)">
+          <div><div class="day-date">${d.date}</div><div class="day-name">${d.day}</div></div>
+          <div class="day-head-right">${badge}${chevron}</div>
+        </div>
+        <div class="day-rule"></div>
+        <div class="day-body${expanded?"":" collapsed"}">
+          ${cardsHTML}${placeBtn}
+        </div>
+      </div>`;
+  }).join("");
+}
+
+function renderLegend() {
+  document.getElementById("legend").innerHTML = Object.entries(CAT).map(([k,v])=>
+    `<div class="legend-item"><div class="legend-dot" style="background:${v.line}"></div><span class="legend-label">${v.label}</span></div>`
+  ).join("");
+}
+
+function cardHTML(item, from) {
+  const cat = CAT[item.category]||CAT.relaxation;
+  const isDone = doneSet.has(item.id);
+  const isSel = selectedItem===item.id;
+  const inBank = from==="bank";
+  const checkBtn = !inBank?`<button class="card-check${isDone?" checked":""}" onclick="toggleDone('${item.id}',event)">${isDone?"✓":"○"}</button>`:"";
+  const removeBtn = !inBank?`<button class="card-remove" onclick="removeCard('${item.id}','${from}',event)">✕</button>`:"";
+  return `
+    <div class="card${isDone?" done":""}${isSel?" selected":""}" onclick="cardTap('${item.id}','${from}',event)" style="border-left:3px solid ${cat.line}">
+      <div class="card-inner">
+        <div class="card-emoji">${item.emoji}</div>
+        <div class="card-body" style="padding-right:${!inBank?"30px":"0"}">
+          <div class="card-name">${item.name}</div>
+          ${item.duration?`<div class="card-duration">${item.duration}</div>`:""}
+          ${item.tip?`<div class="card-tip">${item.tip}</div>`:""}
+          <span class="card-tag" style="background:${cat.bg};color:${cat.color}">${cat.label}</span>
+        </div>
+      </div>
+      ${!inBank?`<div class="card-action">${checkBtn}${removeBtn}</div>`:""}
+    </div>`;
+}
+
+function cardTap(id, from, e) {
+  e.stopPropagation();
+  if (from!=="bank") return;
+  if (selectedItem===id) { clearSelection(); return; }
+  selectedItem=id; selectedFrom=from;
+  render();
+  showToast("Selected — now go to the Itinerary tab and tap a day", 3000);
+}
+
+function dayTap(key, e) {
+  if (!selectedItem) return;
+  if (e.target.closest(".card")||e.target.closest(".day-head")) return;
+  placeTo(key);
+}
+
+function placeTo(key) {
+  if (!selectedItem) { showToast("First tap an activity in the Bank to select it", 2500); return; }
+  const item = bank.find(x=>x.id===selectedItem);
+  if (!item) { clearSelection(); return; }
+  bank = bank.filter(x=>x.id!==selectedItem);
+  dayItems[key] = [...(dayItems[key]||[]), item];
+  expandedDays.add(key);
+  clearSelection();
+  showTab("itin");
+  showToast(`${item.emoji}  Added to ${DAYS.find(d=>d.key===key).date}`, 2500);
+}
+
+function toggleDay(key, e) {
+  e.stopPropagation();
+  expandedDays.has(key)?expandedDays.delete(key):expandedDays.add(key);
+  render();
+}
+
+function removeCard(id, from, e) {
+  e.stopPropagation();
+  const item = (dayItems[from]||[]).find(x=>x.id===id);
+  if (!item) return;
+  dayItems[from] = dayItems[from].filter(x=>x.id!==id);
+  bank.push(item); doneSet.delete(id);
+  render(); showToast("Moved back to Activity Bank", 2000);
+}
+
+function toggleDone(id, e) {
+  e.stopPropagation();
+  doneSet.has(id)?doneSet.delete(id):doneSet.add(id);
+  render();
+}
+
+function setFilter(f) { activeFilter=f; render(); }
+
+function clearSelection() { selectedItem=null; selectedFrom=null; render(); }
+
+function updateBanner() {
+  const banner = document.getElementById("selBanner");
+  if (selectedItem) {
+    const item = bank.find(x=>x.id===selectedItem);
+    document.getElementById("selBannerText").textContent = item?`"${item.name}" selected`:"Activity selected";
+    banner.classList.add("show");
+  } else { banner.classList.remove("show"); }
+}
+
+function updateProgress() {
+  const total = Object.values(dayItems).flat().length;
+  const done = doneSet.size;
+  document.getElementById("progressFill").style.width = (total?Math.min((done/total)*100,100):0)+"%";
+  document.getElementById("progressLbl").textContent = `${done} of ${total} complete`;
+}
+
+let toastTimer;
+function showToast(msg, dur=2000) {
+  const el = document.getElementById("toast");
+  el.textContent = msg; el.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>el.classList.remove("show"), dur);
+}
+
+function openModal(id) { document.getElementById(id).classList.add("open"); }
+function closeModal(id) { document.getElementById(id).classList.remove("open"); }
+document.querySelectorAll(".modal-bg").forEach(el=>{
+  el.addEventListener("click", e=>{ if(e.target===el) el.classList.remove("open"); });
+});
+
+function openAdd() {
+  document.getElementById("addCat").innerHTML = Object.entries(CAT).map(([k,v])=>`<option value="${k}">${v.label}</option>`).join("");
+  ["addName","addEmoji","addDuration","addTip"].forEach(id=>document.getElementById(id).value="");
+  openModal("addModal");
+  setTimeout(()=>document.getElementById("addName").focus(), 300);
+}
+
+function submitAdd() {
+  const name = document.getElementById("addName").value.trim();
+  if (!name) { document.getElementById("addName").style.borderColor="#9A4030"; return; }
+  document.getElementById("addName").style.borderColor="";
+  bank.push({ id:uid(), name,
+    emoji: document.getElementById("addEmoji").value.trim()||"✦",
+    category: document.getElementById("addCat").value,
+    duration: document.getElementById("addDuration").value.trim(),
+    tip: document.getElementById("addTip").value.trim(),
+  });
+  activeFilter="all"; closeModal("addModal"); render();
+  showToast("Added to Activity Bank", 2000);
+}
+
+function openShare() {
+  const lines = DAYS.map(d=>{
+    const its = dayItems[d.key]||[];
+    return its.length
+      ?`${d.date} (${d.day})\n`+its.map(i=>`  ${i.emoji}  ${i.name}`).join("\n")
+      :`${d.date} (${d.day})\n  Open`;
+  });
+  document.getElementById("shareTxt").textContent = "Coco's Austin — May 9–19, 2026\n\n"+lines.join("\n\n");
+  openModal("shareModal");
+}
+
+function copyShare() {
+  const text = document.getElementById("shareTxt").textContent;
+  navigator.clipboard.writeText(text).then(()=>{
+    closeModal("shareModal"); showToast("Copied to clipboard", 2500);
+  }).catch(()=>{
+    const ta = document.createElement("textarea");
+    ta.value=text; ta.style.position="fixed"; ta.style.opacity="0";
+    document.body.appendChild(ta); ta.select(); document.execCommand("copy");
+    document.body.removeChild(ta);
+    closeModal("shareModal"); showToast("Copied to clipboard", 2500);
+  });
+}
+
+document.getElementById("addModal").addEventListener("keydown", e=>{
+  if(e.key==="Enter"&&e.target.tagName!=="TEXTAREA") submitAdd();
+});
+
+render();
+</script>
+</body>
+</html>
